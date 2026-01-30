@@ -37,6 +37,9 @@ function initializeApp() {
     // Configurar atualizações em tempo real
     setupRealTimeUpdates();
 
+    // Buscar cotação inicial
+    updateExchangeRate();
+
     console.log("Calculadora de Tokens inicializada com sucesso");
 
     // Mostrar mensagem de boas-vindas
@@ -86,6 +89,7 @@ function captureElements() {
   // Botões
   elements.buttons = {
     clear: document.getElementById("clearBtn"),
+    refreshRate: document.getElementById("refreshExchangeRate"),
   };
 
   // Verificar se todos os elementos foram encontrados
@@ -164,6 +168,11 @@ function setupEventListeners() {
     );
     // Definir valor padrão se vazio
     if (!exchangeRateInput.value) exchangeRateInput.value = "5.50";
+  }
+
+  // Botão de refresh da taxa de câmbio
+  if (elements.buttons.refreshRate) {
+    elements.buttons.refreshRate.addEventListener("click", () => updateExchangeRate(true));
   }
 }
 
@@ -578,6 +587,47 @@ function hideLoadingState() {
 function updateCurrencyConversion() {
   if (appState.currentResult) {
     updateExecutiveSummary(appState.currentResult.summary);
+  }
+}
+
+/**
+ * Busca e atualiza a taxa de câmbio via API
+ * @param {boolean} isManual - Se a atualização foi solicitada manualmente
+ */
+async function updateExchangeRate(isManual = false) {
+  const btn = elements.buttons.refreshRate;
+  const input = document.getElementById("usdToBrlRate");
+
+  if (!input) return;
+
+  try {
+    // Estado de carregamento
+    if (btn) {
+      btn.disabled = true;
+      btn.classList.add("animate-spin");
+    }
+
+    const rate = await TokenCalculatorUtils.fetchExchangeRate();
+
+    if (rate) {
+      input.value = rate.toFixed(2);
+      updateCurrencyConversion();
+
+      // Feedback apenas se for acionado manualmente
+      if (isManual) {
+        TokenCalculatorUtils.showMessage(`Dólar atualizado: R$ ${rate.toFixed(2)}`, "success", 2000);
+      }
+    }
+  } catch (error) {
+    console.error("Erro ao atualizar câmbio:", error);
+    if (isManual) {
+      TokenCalculatorUtils.showMessage("Não foi possível atualizar o dólar automaticamente.", "warning");
+    }
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.classList.remove("animate-spin");
+    }
   }
 }
 

@@ -164,6 +164,25 @@ function getCurrentExchangeRate() {
 }
 
 /**
+ * Busca a taxa de câmbio USD para BRL em tempo real via API
+ * @returns {Promise<number|null>} - Taxa de câmbio ou null em caso de erro
+ */
+async function fetchExchangeRate() {
+  try {
+    const response = await fetch("https://economia.awesomeapi.com.br/json/last/USD-BRL");
+    if (!response.ok) throw new Error("Erro ao buscar cotação");
+
+    const data = await response.json();
+    const rate = parseFloat(data.USDBRL.bid);
+
+    return rate;
+  } catch (error) {
+    console.error("Erro na API de câmbio:", error);
+    return null;
+  }
+}
+
+/**
  * Valida se uma quantidade é válida
  * @param {number} quantity - Quantidade a ser validada
  * @returns {object} - Objeto com resultado da validação
@@ -464,6 +483,7 @@ window.TokenCalculatorUtils = {
   convertPricePerMillionToPerToken,
   convertUSDToBRL,
   getCurrentExchangeRate,
+  fetchExchangeRate,
   debounce,
   addAnimatedClass,
   removeAnimatedClass,

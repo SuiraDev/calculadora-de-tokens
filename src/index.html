@@ -42,7 +42,7 @@
         <div class="flex items-center gap-4">
           <!-- Conversor Real -->
           <div
-            class="hidden sm:flex items-center gap-2 bg-secondary/50 rounded-md px-3 py-1.5 border border-transparent hover:border-border transition-colors">
+            class="hidden sm:flex items-center gap-2 bg-secondary/50 rounded-md px-3 py-1.5 border border-transparent hover:border-border transition-colors group/rate">
             <iconify-icon icon="circle-flags:br" class="text-base shadow-sm rounded-full"></iconify-icon>
             <div class="flex items-center">
               <span class="text-xs text-muted-foreground mr-1">R$</span>
@@ -51,6 +51,11 @@
                 title="Taxa USD para BRL" />
               <span class="text-xs text-muted-foreground">/USD</span>
             </div>
+            <button id="refreshExchangeRate"
+              class="flex items-center justify-center text-muted-foreground hover:text-primary transition-colors focus:outline-none"
+              title="Atualizar cotação">
+              <iconify-icon icon="hugeicons:refresh-active" class="text-sm"></iconify-icon>
+            </button>
           </div>
           <div class="text-xs font-mono text-muted-foreground/60 bg-secondary/30 px-2 py-1 rounded">
             v2.0.0
