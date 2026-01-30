@@ -1,5 +1,4 @@
-# Estágio de Build
-FROM node:20-alpine AS builder
+FROM node:20-alpine
 
 WORKDIR /app
 
@@ -7,21 +6,18 @@ WORKDIR /app
 COPY package*.json ./
 RUN npm install
 
-# Copiar código fonte e buildar
+# Copiar código fonte
 COPY . .
+
+# Expor porta de desenvolvimento (Vite = 5173 ou você pode configurar para 3000)
+# Para produção sem Nginx, temos que usar o comando preview do Vite
+# IMPORTANTE: preview é apenas para testar localmente, não recomendado para alta carga
+# Mas se o Dokploy resolve o SSL/Proxy, funciona.
+EXPOSE 4173
+
+# Buildar o projeto
 RUN npm run build
 
-# Estágio de Produção
-FROM nginx:alpine
-
-# Copiar arquivos estáticos do build
-COPY --from=builder /app/dist /usr/share/nginx/html
-
-# Copiar configuração customizada do Nginx
-COPY nginx.conf /etc/nginx/conf.d/default.conf
-
-# Expor porta 80
-EXPOSE 80
-
-# Iniciar Nginx
-CMD ["nginx", "-g", "daemon off;"]
+# Rodar em modo preview (serve a pasta dist)
+# A flag --host é crucial para o Docker aceitar conexões externas
+CMD ["npm", "run", "preview", "--", "--host", "--port", "4173"]
